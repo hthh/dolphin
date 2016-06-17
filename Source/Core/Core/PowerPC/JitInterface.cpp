@@ -264,6 +264,9 @@ namespace JitInterface
 		case ExceptionType::EXCEPTIONS_PAIRED_QUANTIZE:
 			exception_addresses = &jit->js.pairedQuantizeAddresses;
 			break;
+		case ExceptionType::EXCEPTIONS_SPECULATIVE_CONSTANTS:
+			exception_addresses = &jit->js.noSpeculativeConstantsAddresses;
+			break;
 		}
 
 		if (PC != 0 && (exception_addresses->find(PC)) == (exception_addresses->end()))

@@ -339,7 +339,7 @@ void JitArm64::SafeStoreFromReg(s32 dest, u32 value, s32 regOffset, u32 flags, s
 		}
 		ADD(W0, W0, accessSize >> 3);
 		STR(INDEX_UNSIGNED, W0, X30, count_off);
-		js.fifoBytesThisBlock += accessSize >> 3;
+		js.fifoBytesSinceCheck += accessSize >> 3;
 
 		if (accessSize != 8)
 			gpr.Unlock(WA);

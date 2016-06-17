@@ -151,7 +151,7 @@ void JitArm64::Break(UGeckoInstruction inst)
 
 void JitArm64::Cleanup()
 {
-	if (jo.optimizeGatherPipe && js.fifoBytesThisBlock > 0)
+	if (jo.optimizeGatherPipe && js.fifoBytesSinceCheck > 0)
 	{
 		gpr.Lock(W0);
 		MOVI2R(X0, (u64)&GPFifo::FastCheckGatherPipe);
@@ -407,7 +407,7 @@ const u8* JitArm64::DoJit(u32 em_address, PPCAnalyst::CodeBuffer *code_buf, JitB
 	js.firstFPInstructionFound = false;
 	js.assumeNoPairedQuantize = false;
 	js.blockStart = em_address;
-	js.fifoBytesThisBlock = 0;
+	js.fifoBytesSinceCheck = 0;
 	js.downcountAmount = 0;
 	js.skipInstructions = 0;
 	js.curBlock = b;
@@ -492,9 +492,9 @@ const u8* JitArm64::DoJit(u32 em_address, PPCAnalyst::CodeBuffer *code_buf, JitB
 		// Gather pipe writes using a non-immediate address are discovered by profiling.
 		bool gatherPipeIntCheck = jit->js.fifoWriteAddresses.find(ops[i].address) != jit->js.fifoWriteAddresses.end();
 
-		if (jo.optimizeGatherPipe && js.fifoBytesThisBlock >= 32)
+		if (jo.optimizeGatherPipe && js.fifoBytesSinceCheck >= 32)
 		{
-			js.fifoBytesThisBlock -= 32;
+			js.fifoBytesSinceCheck = 0;
 
 			gpr.Lock(W30);
 			BitSet32 regs_in_use = gpr.GetCallerSavedUsed();

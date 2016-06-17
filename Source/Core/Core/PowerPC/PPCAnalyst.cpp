@@ -842,10 +842,13 @@ u32 PPCAnalyzer::Analyze(u32 address, CodeBlock *block, CodeBuffer *buffer, u32 
 	}
 
 	// Forward scan, for flags that need the other direction for calculation.
-	BitSet32 fprIsSingle, fprIsDuplicated, fprIsStoreSafe;
+	BitSet32 fprIsSingle, fprIsDuplicated, fprIsStoreSafe, gprDefined, gprBlockInputs;
 	BitSet8 gqrUsed, gqrModified;
 	for (u32 i = 0; i < block->m_num_instructions; i++)
 	{
+		gprBlockInputs |= code[i].regsIn & ~gprDefined;
+		gprDefined |= code[i].regsOut;
+
 		code[i].fprIsSingle = fprIsSingle;
 		code[i].fprIsDuplicated = fprIsDuplicated;
 		code[i].fprIsStoreSafe = fprIsStoreSafe;
@@ -898,6 +901,7 @@ u32 PPCAnalyzer::Analyze(u32 address, CodeBlock *block, CodeBuffer *buffer, u32 
 	}
 	block->m_gqr_used = gqrUsed;
 	block->m_gqr_modified = gqrModified;
+	block->m_gpr_inputs = gprBlockInputs;
 	return address;
 }
 
